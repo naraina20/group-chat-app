@@ -1,0 +1,246 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group-Chat</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #container {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* background-image: linear-gradient(rgb(21, 55, 77), rgb(83, 238, 238)); */
+        background: url(/static/img1.png) no-repeat center center/cover;
+
+    }
+
+    #messages {
+        width: 45%;
+        height: 71vh;
+        padding: 7px;
+        background: transparent;
+        border-radius: 5px;
+        border: 2px solid black;
+        margin: 10px 0px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        font-family: cursive;
+        position: absolute;
+        top: 10vh;
+    }
+
+    .logo {
+        width: 46%;
+        height: 8vh;
+        top: 0px;
+        margin-top: 8px;
+        left: 7px;
+        display: flex;
+        border: 2px solid black;
+        border-radius: 5px;
+        flex-direction: row;
+    }
+
+
+    .image {
+        width: 25%;
+        height: 100%;
+        position: relative;
+    }
+
+    .image img {
+        object-fit: cover;
+        object-position: center;
+        width: 84px;
+        height: 56px;
+    }
+
+    .text {
+        width: 75%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        font-size: 2rem;
+        justify-content: center;
+        font-weight: 900;
+    }
+
+    .text p {
+        text-align: center;
+        font-family: fantasy;
+        color: #882bf6;
+    }
+
+    ul li {
+        list-style: none;
+    }
+
+    .chat-box {
+        background-color: lightskyblue;
+        border: 1px solid black;
+        border-radius: 8px;
+        color: black;
+        width: 30%;
+        min-height: 5vh;
+        max-height: auto;
+        display: flex;
+        padding: 0px 5px;
+        align-items: center;
+        overflow: hidden;
+        margin: 8px 0;
+        box-shadow: 15px 6px 40px -4px;
+    }
+
+
+    .left {
+        float: left;
+        clear: both;
+    }
+
+    .right {
+        float: right;
+        clear: both;
+    }
+
+    #form {
+        width: 45%;
+        background: lightskyblue;
+        height: 10vh;
+        padding: 5px;
+        display: flex;
+        border-radius: 5px;
+        position: absolute;
+        align-items: center;
+        bottom: 10px;
+        justify-content: center;
+
+    }
+
+    #input {
+        width: 84%;
+        height: 100%;
+        border-radius: 5px;
+        resize: none;
+        font-weight: 500;
+        font-family: cursive;
+        padding: 5px;
+    }
+
+    button {
+        width: 15%;
+        height: 100%;
+        font-weight: 900;
+        position: relative;
+        margin-left: 5px;
+        border-radius: 5px;
+        background: #882bf6;
+    }
+
+    @media only screen and (max-width: 1000px) {
+        #container {
+            background: url(/static/img2.jpg);
+        }
+
+        .logo {
+            width: 90%;
+            height: 8vh;
+        }
+
+        .image img {
+            width: 125px;
+            height: 74px;
+        }
+
+        .text {
+            width: 75%;
+            height: 100%;
+            font-size: 1.9rem;
+        }
+
+        #messages {
+            width: 90%;
+        }
+
+        #form {
+            width: 90%;
+        }
+
+
+    }
+</style>
+
+<body>
+    <div id="container">
+        <div class="logo">
+            <span class="image">
+                <img src="/static/logo.png" alt="">
+            </span>
+            <span class="text">
+                <p>WELCOME TO THE GROUP CHAT</p>
+            </span>
+        </div>
+        <ul id="messages">
+
+        </ul>
+        <form id="form" action="">
+            <textarea id="input" cols="50" rows="5"></textarea>
+            <button type="submit">SEND</button>
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const Socket = io('http://localhost:3000');
+
+        const msgcontainer = document.getElementById('messages')
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+        var audio = new Audio('/static/ting.mp3')
+
+        const append = (message, position) => {
+            const messagebox = document.createElement('li')
+            messagebox.innerText = message;
+            messagebox.classList.add('chat-box')
+            messagebox.classList.add(position)
+            msgcontainer.append(messagebox)
+            if (position == 'left') {
+                audio.play();
+            }
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = input.value;
+            append(`you: ${message}`, 'right')
+            Socket.emit('send', message);
+            input.value = '';
+        })
+
+        const name = prompt('Enter your name-');
+        Socket.emit("new-user-joined", name);
+
+        Socket.on('user-joined', name => {
+            append(`${name} joined the chat`, 'left')
+        });
+
+        Socket.on('left', name => {
+            append(`${name} is left`, 'left')
+        });
+
+        Socket.on('receive', data => {
+            append(`${data.name}: ${data.message}`, 'left')
+        });
+
+    </script>
+</body>
+
+</html>
