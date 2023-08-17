@@ -8,7 +8,7 @@ import ReactScrollToBottom from "react-scroll-to-bottom"
 import closeIcon from "../../image/closeIcon.png"
 
 
-const ENDPOINT = "https://group-chat-ap.herokuapp.com/";
+const ENDPOINT = "http://localhost:4500/";
 
 let socket;
 
