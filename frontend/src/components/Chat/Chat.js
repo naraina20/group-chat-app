@@ -8,7 +8,7 @@ import ReactScrollToBottom from "react-scroll-to-bottom"
 import closeIcon from "../../image/closeIcon.png"
 
 
-const ENDPOINT = "http://localhost:4500/";
+const ENDPOINT = "https://group-chat-gwtq.onrender.com/";
 
 let socket;
 
