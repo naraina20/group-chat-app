@@ -1,33 +1,28 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./Join.css";
 import { Link } from "react-router-dom";
-
-let user;
-
-const sendUser = () => {
-  user = document.getElementById("joinInput").value;
-  document.getElementById("joinInput").value = "";
-};
+import { useUser } from "../../UserContext"; // import the context hook
 
 const Join = () => {
-  const [name, setname] = useState("");
+  const { setUser } = useUser(); // use context to set the user
+  const inputRef  = useRef(null)
 
   return (
     <div className="JoinPage">
       <div className="JoinContainer">
         <h1>JOIN GROUP CHAT</h1>
         <input
-          onChange={(e) => setname(e.target.value)}
+          onChange={(e) => setUser(e.target.value)}
           placeholder="Enter Your Name"
           type="text"
+          ref={inputRef}
           id="joinInput"
         />
         <Link
-          onClick={(event) => (!name ? event.preventDefault() : null)}
+          onClick={(event)=> !inputRef.current.value ? event.preventDefault():null}
           to="/chat"
         >
-          {" "}
-          <button onClick={sendUser} className="joinbtn">
+          <button className="joinbtn">
             Login In
           </button>
         </Link>
@@ -37,4 +32,3 @@ const Join = () => {
 };
 
 export default Join;
-export { user };

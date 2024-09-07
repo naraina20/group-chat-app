@@ -8,7 +8,7 @@ const socketIO = require("socket.io");
 const path = require("path");
 const io = socketIO(server);
 
-const users = [{}];
+const users = [];
 
 app.use(cors());
 
@@ -22,22 +22,19 @@ app.get("*", (req, res) => {
 //socket
 
 io.on("connection", (socket) => {
-  console.log("new connection")
 
   socket.on("joined", ({ user }) => {
     users[socket.id] = user;
-    console.log(`${user} has joined`)
-    socket.emit("welcome", {user: `${user},`, message : `welcome to the chat `})
-    socket.broadcast.emit("userJoined", {user: `${user},`, message : `has joined the chat`})
+    socket.emit("welcome", {user: `${user}`, message : `welcome to the chat `}) // emiting a message to current socket (user) only
+    socket.broadcast.emit("userJoined", {user: `${user}`, message : `has joined the chat`}) // emitting a message to all sockets except current one
   })
 
   socket.on('disconnect', () => {
     socket.broadcast.emit('leave', {user : `${users[socket.id]}`, message : `has left the chat`})
-    console.log("user left")
   })
   
   socket.on('message', ({message,id}) => {
-    io.emit('sendmessage', { user: users[id], message, id });
+    io.emit('sendmessage', { user: users[id], message, id }); // emitting a message to all sockets including current one
   })
   
 
